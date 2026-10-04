@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rescue Center</title>
+<style>
+  body { font-family: system-ui, sans-serif; margin: 0; background: #111; color: #eee; }
+  header { padding: 16px 24px; background: #1b1b1b; display: flex; justify-content: space-between; align-items: center; }
+  h1 { margin: 0; font-size: 22px; }
+  #count { color: #aaa; }
+  table { width: 100%; border-collapse: collapse; }
+  th, td { padding: 10px 14px; text-align: left; border-bottom: 1px solid #2a2a2a; vertical-align: top; }
+  th { color: #999; font-weight: 600; font-size: 13px; text-transform: uppercase; }
+  .tag { padding: 3px 10px; border-radius: 4px; font-weight: 700; color: #000; }
+  .RED { background: #ff4d4d; } .YELLOW { background: #ffd23f; } .GREEN { background: #4cd964; }
+  .hex { font-family: ui-monospace, monospace; font-size: 12px; color: #8ab4f8; }
+  .muted { color: #888; font-size: 13px; }
+  .empty { padding: 40px; text-align: center; color: #777; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Rescue Center: incoming distress frames</h1>
+  <span id="count">waiting...</span>
+</header>
+<table>
+  <thead><tr><th>Priority</th><th>Report</th><th>Location</th><th>From</th><th>Sent (local)</th><th>Raw 16-byte frame</th></tr></thead>
+  <tbody id="rows"></tbody>
+</table>
+<div id="empty" class="empty">No messages yet. Send one from a phone.</div>
+<script>
+function cell(text, cls) {
+  const td = document.createElement("td");
+  if (cls) td.className = cls;
+  td.textContent = text;
+  return td;
+}
+
+function sentTime(minuteOfDayUtc) {
+  const d = new Date();
+  d.setUTCHours(Math.floor(minuteOfDayUtc / 60), minuteOfDayUtc % 60, 0, 0);
+  return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+}
+
+async function refresh() {
+  try {
+    const res = await fetch("/messages");
+    const msgs = await res.json();
+    const rows = document.getElementById("rows");
+    rows.replaceChildren();
+    for (const m of msgs) {
+      const tr = document.createElement("tr");
+      const p = document.createElement("td");
+      const tag = document.createElement("span");
+      tag.className = "tag " + m.priority_label;
+      tag.textContent = m.priority_label;
+      p.appendChild(tag);
+      tr.append(
+        p,
+        cell(m.brief),
+        cell(m.lat.toFixed(5) + ", " + m.lon.toFixed(5)),
+        cell("device " + m.device + " · seq " + m.seq + " · " + m.hops + " hops", "muted"),
+        cell(sentTime(m.time), "muted"),
+        cell(m.frame_hex, "hex"),
+      );
+      rows.appendChild(tr);
+    }
+    document.getElementById("empty").style.display = msgs.length ? "none" : "block";
+    document.getElementById("count").textContent = msgs.length + " message(s)";
+  } catch (e) {
+    document.getElementById("count").textContent = "gateway unreachable";
+  }
+}
+refresh();
+setInterval(refresh, 2000);
+</script>
+</body>
+</html>

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#b00020">
+<title>Distress</title>
+<style>
+  * { box-sizing: border-box; }
+  body { font-family: system-ui, sans-serif; margin: 0; padding: 16px; background: #111; color: #eee; }
+  h1 { font-size: 22px; margin: 4px 0 16px; }
+  label { display: block; margin: 14px 0 6px; font-weight: 600; }
+  select, input { width: 100%; padding: 12px; font-size: 17px; border-radius: 8px; border: 1px solid #444; background: #1e1e1e; color: #eee; }
+  .row { display: flex; gap: 8px; }
+  #send { width: 100%; margin-top: 22px; padding: 18px; font-size: 22px; font-weight: 800; border: 0; border-radius: 10px; background: #d32f2f; color: #fff; }
+  #send:disabled { background: #555; }
+  .box { margin-top: 14px; padding: 12px; border-radius: 8px; background: #1b1b1b; font-size: 14px; line-height: 1.5; }
+  .tag { padding: 2px 8px; border-radius: 4px; font-weight: 700; color: #000; }
+  .RED { background: #ff4d4d; } .YELLOW { background: #ffd23f; } .GREEN { background: #4cd964; }
+  .hex { font-family: ui-monospace, monospace; color: #8ab4f8; word-break: break-all; }
+  .ok { color: #4cd964; } .err { color: #ff6b6b; }
+</style>
+</head>
+<body>
+<h1>Send a distress report</h1>
+
+<label for="injury">What is wrong?</label>
+<select id="injury"></select>
+
+<label for="mobility">Can you move?</label>
+<select id="mobility"></select>
+
+<label for="people">How many people need help?</label>
+<select id="people"></select>
+
+<label for="hazard">Any danger nearby?</label>
+<select id="hazard"></select>
+
+<label for="needs">What do you need most?</label>
+<select id="needs"></select>
+
+<div class="box" id="preview">Loading...</div>
+
+<div class="box">
+  <div id="gps">Getting location...</div>
+  <div class="row" style="margin-top:8px">
+    <input id="lat" inputmode="decimal" placeholder="latitude">
+    <input id="lon" inputmode="decimal" placeholder="longitude">
+  </div>
+</div>
+
+<button id="send" disabled>SEND SOS</button>
+<div class="box" id="result">Nothing sent yet.</div>
+
+<script src="frame.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
